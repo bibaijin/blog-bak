@@ -2,13 +2,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 import           Data.Monoid (mappend)
 import           Hakyll
-import qualified Hakyll.Core.Configuration       as Config
+import qualified Hakyll.Core.Configuration
 
 
 --------------------------------------------------------------------------------
 main :: IO ()
--- main = hakyll $ do
-main = hakyllWith Config.defaultConfiguration { previewHost = "0.0.0.0" } $ do
+main = hakyllWith config $ do
     match "images/*" $ do
         route   idRoute
         compile copyFileCompiler
@@ -61,6 +60,8 @@ main = hakyllWith Config.defaultConfiguration { previewHost = "0.0.0.0" } $ do
 
     match "templates/*" $ compile templateCompiler
 
+config :: Configuration
+config = defaultConfiguration { previewHost = "0.0.0.0" }
 
 --------------------------------------------------------------------------------
 postCtx :: Context String
