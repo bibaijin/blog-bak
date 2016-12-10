@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 {-# LANGUAGE OverloadedStrings #-}
-import           Data.Monoid (mappend)
+import           Data.Monoid               (mappend)
 import           Hakyll
 import qualified Hakyll.Core.Configuration
 
@@ -16,15 +16,10 @@ main = hakyllWith config $ do
         route   idRoute
         compile compressCssCompiler
 
-    match (fromList ["about.rst", "contact.markdown"]) $ do
-        route   $ setExtension "html"
-        compile $ pandocCompiler
-            >>= loadAndApplyTemplate "templates/default.html" defaultContext
-            >>= relativizeUrls
-
     match "posts/*" $ do
         route $ setExtension "html"
         compile $ pandocCompiler
+            >>= saveSnapshot "content"
             >>= loadAndApplyTemplate "templates/post.html"    postCtx
             >>= loadAndApplyTemplate "templates/default.html" postCtx
             >>= relativizeUrls
@@ -48,9 +43,14 @@ main = hakyllWith config $ do
         route idRoute
         compile $ do
             posts <- recentFirst =<< loadAll "posts/*"
+            firstPost <- return $ take 1 posts
+            remainingPosts <- return $ drop 1 posts
             let indexCtx =
                     listField "posts" postCtx (return posts) `mappend`
-                    constField "title" "Home"                `mappend`
+                    field "postsCount" (\_ -> return $ show $ length posts) `mappend`
+                    listField "firstPost" postCtx (return firstPost) `mappend`
+                    listField "remainingPosts" postCtx (return remainingPosts) `mappend`
+                    constField "title" "主页" `mappend`
                     defaultContext
 
             getResourceBody
@@ -60,12 +60,11 @@ main = hakyllWith config $ do
 
     match "templates/*" $ compile templateCompiler
 
+--------------------------------------------------------------------------------
 config :: Configuration
 config = defaultConfiguration { previewHost = "0.0.0.0" }
 
---------------------------------------------------------------------------------
 postCtx :: Context String
 postCtx =
-    dateField "date" "%B %e, %Y" `mappend`
-    defaultContext
-
+  dateField "date" "%Y 年 %m 月 %d 日" `mappend` teaserField "teaser" "content" `mappend`
+  defaultContext
