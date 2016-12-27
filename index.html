@@ -1,7 +1,12 @@
 <div class="blog__posts mdl-grid">
     <div class="mdl-card coffee-pic mdl-cell mdl-cell--8-col">
         $for(firstPost)$
-            <div class="mdl-card__media mdl-color-text--grey-50">
+            $if(image)$
+            <div class="mdl-card__media mdl-color-text--grey-50"
+                 style="background-image: url('/images/$image$')">
+            $else$
+                <div class="mdl-card__media mdl-color-text--grey-50">
+            $endif$
                 <h3><a href="$url$">$title$</a></h3>
             </div>
             <div class="mdl-card__supporting-text meta mdl-color-text--grey-600">

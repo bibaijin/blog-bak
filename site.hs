@@ -3,6 +3,9 @@
 import           Data.Monoid               (mappend)
 import           Hakyll
 import qualified Hakyll.Core.Configuration
+import           Hakyll.Web.Pandoc
+import           Text.Pandoc.Options
+import qualified Data.Set as S
 
 
 --------------------------------------------------------------------------------
@@ -18,7 +21,7 @@ main = hakyllWith config $ do
 
     match "posts/*" $ do
         route $ setExtension "html"
-        compile $ pandocCompiler
+        compile $ customPandocCompiler
             >>= saveSnapshot "content"
             >>= loadAndApplyTemplate "templates/post.html"    postCtx
             >>= loadAndApplyTemplate "templates/default.html" postCtx
@@ -68,3 +71,12 @@ postCtx :: Context String
 postCtx =
   dateField "date" "%Y 年 %m 月 %d 日" `mappend` teaserField "teaser" "content" `mappend`
   defaultContext
+
+customPandocCompiler :: Compiler (Item String)
+customPandocCompiler =
+  pandocCompilerWith readerOptions defaultHakyllWriterOptions
+  where customExtensions = [Ext_east_asian_line_breaks]
+        defaultExtensions = readerExtensions defaultHakyllReaderOptions
+        newExtensions = foldr S.insert defaultExtensions customExtensions
+        readerOptions =
+          defaultHakyllReaderOptions {readerExtensions = newExtensions}

@@ -1,8 +1,23 @@
-<div class="info">
-    Posted on $date$
-    $if(author)$
-        by $author$
-    $endif$
-</div>
+<div class="blog__posts mdl-grid">
+    <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+        <div class="mdl-card__title">
+            <h1 class="mdl-card__title-text">$title$</h1>
+        </div>
 
-$body$
+        $if(image)$
+        <div class="mdl-card__media">
+            <img src="/images/$image$">
+        </div>
+        $endif$
+
+        <div class="mdl-card__supporting-text meta mdl-color-text--grey-700">
+            <span>$date$</span>
+            <div class="mdl-layout-spacer"></div>
+            <span>$date$</span>
+        </div>
+
+        <div class="mdl-card__supporting-text mdl-color-text--grey-700">
+            $body$
+        </div>
+    </div>
+</div>
